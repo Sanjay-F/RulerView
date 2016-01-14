@@ -10,6 +10,7 @@ import android.graphics.Paint;
 import android.text.Layout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -20,6 +21,7 @@ import android.view.View;
  * Description: 参考自: http://blog.csdn.net/dashu8193058/article/details/45846189
  */
 public class RulerWheel extends View {
+    private String TAG = this.getClass().getSimpleName();
     // 默认刻度模式
     public static final int MOD_TYPE_SCALE = 5;
     // 1/2模式
@@ -34,7 +36,12 @@ public class RulerWheel extends View {
     private int mTextSize = 36;
     // 分隔线(大号)
     private int mLineHeighMax;
+    //最大刻度的粗细
+    private int mMaxBarWidth;
+    private int mMidBarWidth;
+    private int mMinBarWidth;
     private int mLineColorMax;
+    private int mTextColor;
     // 分隔线(中号)
     private int mLineHeighMid;
     private int mLineColorMid;
@@ -70,13 +77,20 @@ public class RulerWheel extends View {
     // 显示刻度值
     private boolean isShowScaleValue;
 
-    //是否支持渐显效果
+    /**
+     * 是否支持渐显效果
+     */
     private boolean mIsGradinet = false;
+    /**
+     * 最小的可见度
+     */
+    private float MINI_ALPHAT = 0.3F;
+
     private Paint linePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint markPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
     private float mTpDesiredWidth;
-
+    private int scaleWidth;
 
     public RulerWheel(Context context) {
         this(context, null);
@@ -100,15 +114,13 @@ public class RulerWheel extends View {
 
 
         // 刻度宽度
-        int scaleWidth = mTypedArray.getDimensionPixelSize(R.styleable.RulerWheel_scaleWidth, DEFAULT_LINE_SIZE);
+        scaleWidth = mTypedArray.getDimensionPixelSize(R.styleable.RulerWheel_scaleWidth, DEFAULT_LINE_SIZE);
         linePaint.setStrokeWidth(scaleWidth);
 
         // 刻度颜色
         mLineColorMax = mTypedArray.getColor(R.styleable.RulerWheel_lineColorMax, Color.BLACK);
         mLineColorMid = mTypedArray.getColor(R.styleable.RulerWheel_lineColorMid, Color.BLACK);
         mLineColorMin = mTypedArray.getColor(R.styleable.RulerWheel_lineColorMin, Color.BLACK);
-
-        mIsGradinet = mTypedArray.getBoolean(R.styleable.RulerWheel_showGradient, false);
 
         mTextSize = mTypedArray.getInteger(R.styleable.RulerWheel_text_Size, DEFAULT_TEXT_SIZE);
         mCurrValue = mTypedArray.getInteger(R.styleable.RulerWheel_def_value, DEFAULT_CUR_VALUE);
@@ -134,7 +146,6 @@ public class RulerWheel extends View {
         }
         midBitmap = BitmapFactory.decodeResource(getResources(), maskResId);
 
-
         // 线条间距
         mLineDivder = obtainLineDivder(mTypedArray.getDimensionPixelSize(R.styleable.RulerWheel_line_divider, DEFAULT_LINE_DIVID_SIZE));
 
@@ -143,6 +154,16 @@ public class RulerWheel extends View {
         textPaint.setTextSize(mTextSize);
         textPaint.setTextAlign(Paint.Align.CENTER);
         mTpDesiredWidth = Layout.getDesiredWidth("0", textPaint);
+
+
+        //---1/14---新加的特性----
+        mMaxBarWidth = mTypedArray.getDimensionPixelSize(R.styleable.RulerWheel_MaxBarSize, scaleWidth);
+        mMidBarWidth = mTypedArray.getDimensionPixelSize(R.styleable.RulerWheel_MidBarSize, scaleWidth);
+        mMinBarWidth = mTypedArray.getDimensionPixelSize(R.styleable.RulerWheel_MinBarSize, scaleWidth);
+        //渐显显示刻度
+        mIsGradinet = mTypedArray.getBoolean(R.styleable.RulerWheel_showGradient, false);
+        mTextColor = mTypedArray.getColor(R.styleable.RulerWheel_text_color, Color.BLACK);
+        textPaint.setColor(mTextColor);
 
         mTypedArray.recycle();
     }
@@ -210,7 +231,6 @@ public class RulerWheel extends View {
         }
     };
 
-
     private void doScroll(int delta) {
         scrollingOffset += delta;
         int offsetCount = scrollingOffset / mLineDivder;
@@ -271,19 +291,43 @@ public class RulerWheel extends View {
         return Math.min(Math.max(mMinValue, mCurrValue), mMaxValue);
     }
 
+    /***
+     * 这里修改了View的高度是一个固定值！
+     * 可根据需要修改
+     *
+     * @param widthMeasureSpec
+     * @param heightMeasureSpec
+     */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int widthSize = getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec);
         int heightSize;
-        if (midBitmap != null) {
-            heightSize = midBitmap.getHeight() + getPaddingTop() + getPaddingBottom();
-        } else {
-            heightSize = getPaddingTop() + getPaddingBottom();
-        }
+        //如果想修改view的大小请修改这里
 
+        if (alignMode == ALIGN_MOD_DOWN) {
+            if (midBitmap != null) {
+                heightSize = (int) (midBitmap.getHeight() + getPaddingTop() + getPaddingBottom() + 2 * textPaint.getTextSize());
+            } else {
+                heightSize = getPaddingTop() + getPaddingBottom();
+            }
+        } else {
+            if (midBitmap != null) {
+                heightSize = (int) (midBitmap.getHeight() + getPaddingTop() + getPaddingBottom());
+            } else {
+                heightSize = getPaddingTop() + getPaddingBottom();
+            }
+        }
         setMeasuredDimension(widthSize, heightSize);
     }
 
+    /***
+     * 如果想改各个刻度的高度值可以修改这里面的三个参数的值
+     *
+     * @param w
+     * @param h
+     * @param oldw
+     * @param oldh
+     */
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
@@ -291,8 +335,8 @@ public class RulerWheel extends View {
             return;
         int rHeight = h - getPaddingTop() - getPaddingBottom();
         mLineHeighMax = rHeight / 2;
-        mLineHeighMid = rHeight / 4;
-        mLineHeighMin = rHeight / 8;
+        mLineHeighMid = rHeight / 3;
+        mLineHeighMin = rHeight / 7;
     }
 
     @Override
@@ -318,7 +362,17 @@ public class RulerWheel extends View {
      * @param rHeight
      */
     private void drawMiddleUpArrowLine(Canvas canvas, int rWidth, int rHeight) {
-        canvas.drawBitmap(midBitmap, (rWidth - midBitmap.getWidth()) / 2, (rHeight - midBitmap.getHeight()) / 2, markPaint);
+
+        int left;
+        int top;
+        if (alignMode == ALIGN_MOD_DOWN) {
+            left = (rWidth - midBitmap.getWidth()) / 2;
+            top = (int) (textPaint.getTextSize() / 2);
+        } else {
+            left = (rWidth - midBitmap.getWidth()) / 2;
+            top = (int) ((rHeight - midBitmap.getHeight()) / 2);
+        }
+        canvas.drawBitmap(midBitmap, left, top, markPaint);
     }
 
     /**
@@ -344,7 +398,6 @@ public class RulerWheel extends View {
     private void drawUpMode(Canvas canvas, int halfCount, int distanceX, int currValue, int rWidth, int rHeight) {
 
         int ry = (int) (getPaddingTop() + (rHeight - mLineHeighMax) / 2 + textPaint.getTextSize());
-
         int value;
         float xPosition;
         for (int i = 0; i < halfCount; i++) {
@@ -355,6 +408,7 @@ public class RulerWheel extends View {
                 if (value % mModType == 0) {
                     if (mModType == MOD_TYPE_HALF) {
                         linePaint.setColor(mLineColorMax);
+                        linePaint.setStrokeWidth(mMaxBarWidth);
                         canvas.drawLine(xPosition, ry, xPosition, ry + mLineHeighMax, linePaint);
                         if (isShowScaleValue) {
                             canvas.drawText(String.valueOf(value / 2), xPosition, ry - mTpDesiredWidth, textPaint);
@@ -362,18 +416,27 @@ public class RulerWheel extends View {
                     } else if (mModType == MOD_TYPE_SCALE) {
                         if (value % (MOD_TYPE_SCALE * 2) == 0) {
                             linePaint.setColor(mLineColorMax);
+                            linePaint.setStrokeWidth(mMaxBarWidth);
                             canvas.drawLine(xPosition, ry, xPosition, ry + mLineHeighMax, linePaint);
                             if (isShowScaleValue) {
                                 canvas.drawText(String.valueOf(value), xPosition, ry - mTpDesiredWidth, textPaint);
                             }
                         } else {
+                            linePaint.setStrokeWidth(mMidBarWidth);
                             linePaint.setColor(mLineColorMid);
                             canvas.drawLine(xPosition, ry, xPosition, ry + mLineHeighMid, linePaint);
                         }
                     }
                 } else {
-                    linePaint.setColor(mLineColorMin);
-                    canvas.drawLine(xPosition, ry, xPosition, ry + mLineHeighMin, linePaint);
+                    if (mModType == MOD_TYPE_HALF) {
+                        linePaint.setStrokeWidth(mMidBarWidth);
+                        linePaint.setColor(mLineColorMid);
+                        canvas.drawLine(xPosition, ry, xPosition, ry + mLineHeighMid, linePaint);
+                    } else {
+                        linePaint.setColor(mLineColorMin);
+                        linePaint.setStrokeWidth(mMinBarWidth);
+                        canvas.drawLine(xPosition, ry, xPosition, ry + mLineHeighMin, linePaint);
+                    }
                 }
             }
 
@@ -384,6 +447,7 @@ public class RulerWheel extends View {
                 if (value % mModType == 0) {
                     if (mModType == MOD_TYPE_HALF) {
                         linePaint.setColor(mLineColorMax);
+                        linePaint.setStrokeWidth(mMaxBarWidth);
                         canvas.drawLine(xPosition, ry, xPosition, ry + mLineHeighMax, linePaint);
                         if (isShowScaleValue) {
                             canvas.drawText(String.valueOf(value / 2), xPosition, ry - mTpDesiredWidth, textPaint);
@@ -391,18 +455,27 @@ public class RulerWheel extends View {
                     } else if (mModType == MOD_TYPE_SCALE) {
                         if (value % (MOD_TYPE_SCALE * 2) == 0) {
                             linePaint.setColor(mLineColorMax);
+                            linePaint.setStrokeWidth(mMaxBarWidth);
                             canvas.drawLine(xPosition, ry, xPosition, ry + mLineHeighMax, linePaint);
                             if (isShowScaleValue) {
                                 canvas.drawText(String.valueOf(value), xPosition, ry - mTpDesiredWidth, textPaint);
                             }
                         } else {
                             linePaint.setColor(mLineColorMid);
+                            linePaint.setStrokeWidth(mMidBarWidth);
                             canvas.drawLine(xPosition, ry, xPosition, ry + mLineHeighMid, linePaint);
                         }
                     }
                 } else {
-                    linePaint.setColor(mLineColorMin);
-                    canvas.drawLine(xPosition, ry, xPosition, ry + mLineHeighMin, linePaint);
+                    if (mModType == MOD_TYPE_HALF) {
+                        linePaint.setStrokeWidth(mMidBarWidth);
+                        linePaint.setColor(mLineColorMid);
+                        canvas.drawLine(xPosition, ry, xPosition, ry + mLineHeighMid, linePaint);
+                    } else {
+                        linePaint.setColor(mLineColorMin);
+                        linePaint.setStrokeWidth(mMinBarWidth);
+                        canvas.drawLine(xPosition, ry, xPosition, ry + mLineHeighMin, linePaint);
+                    }
                 }
             }
         }
@@ -412,37 +485,49 @@ public class RulerWheel extends View {
     private void drawDownMode(Canvas canvas, int halfCount, int distanceX, int currValue, int rWidth, int rHeight) {
         int value;
         float xPosition;
+
+        Log.e(TAG, " halfCount=" + halfCount + " rWidth" + rWidth);
         //线y坐标
         int ry = (int) (rHeight - mTpDesiredWidth - textPaint.getTextSize()) - getPaddingBottom();
         for (int i = 0; i < halfCount; i++) {
-
             //画显示在屏幕上的右半部分数据---right part
             xPosition = rWidth / 2f + i * mLineDivder + distanceX;
             value = currValue + i;
             if (xPosition <= rWidth && value >= mMinValue && value <= mMaxValue) {
+                Log.e(TAG, "right value=" + value + " xPos=" + xPosition);
                 if (value % mModType == 0) {
                     if (mModType == MOD_TYPE_HALF) {
                         linePaint.setColor(mLineColorMax);
+                        linePaint.setStrokeWidth(mMaxBarWidth);
                         canvas.drawLine(xPosition, ry, xPosition, ry - mLineHeighMax, linePaint);
                         if (isShowScaleValue) {
                             canvas.drawText(String.valueOf(value / 2), xPosition, rHeight - mTpDesiredWidth, textPaint);
                         }
+
                     } else if (mModType == MOD_TYPE_SCALE) {
                         if (value % (MOD_TYPE_SCALE * 2) == 0) {
                             linePaint.setColor(mLineColorMax);
-
+                            linePaint.setStrokeWidth(mMaxBarWidth);
                             canvas.drawLine(xPosition, ry, xPosition, ry - mLineHeighMax, linePaint);
                             if (isShowScaleValue) {
                                 canvas.drawText(String.valueOf(value), xPosition, rHeight - mTpDesiredWidth, textPaint);
                             }
                         } else {
+                            linePaint.setStrokeWidth(mMidBarWidth);
                             linePaint.setColor(mLineColorMid);
                             canvas.drawLine(xPosition, ry, xPosition, ry - mLineHeighMid, linePaint);
                         }
                     }
                 } else {
-                    linePaint.setColor(mLineColorMin);
-                    canvas.drawLine(xPosition, ry, xPosition, ry - mLineHeighMin, linePaint);
+                    if (mModType == MOD_TYPE_HALF) {
+                        linePaint.setStrokeWidth(mMidBarWidth);
+                        linePaint.setColor(mLineColorMid);
+                        canvas.drawLine(xPosition, ry, xPosition, ry - mLineHeighMid, linePaint);
+                    } else {
+                        linePaint.setColor(mLineColorMin);
+                        linePaint.setStrokeWidth(mMinBarWidth);
+                        canvas.drawLine(xPosition, ry, xPosition, ry - mLineHeighMin, linePaint);
+                    }
                 }
             }
 
@@ -450,9 +535,11 @@ public class RulerWheel extends View {
             xPosition = rWidth / 2f - i * mLineDivder + distanceX;
             value = currValue - i;
             if (xPosition > getPaddingLeft() && value >= mMinValue && value <= mMaxValue) {
+                Log.e(TAG, "left value=" + value);
                 if (value % mModType == 0) {
                     if (mModType == MOD_TYPE_HALF) {
                         linePaint.setColor(mLineColorMax);
+                        linePaint.setStrokeWidth(mMaxBarWidth);
                         canvas.drawLine(xPosition, ry, xPosition, ry - mLineHeighMax, linePaint);
                         if (isShowScaleValue) {
                             canvas.drawText(String.valueOf(value / 2), xPosition, rHeight - mTpDesiredWidth, textPaint);
@@ -460,18 +547,27 @@ public class RulerWheel extends View {
                     } else if (mModType == MOD_TYPE_SCALE) {
                         if (value % (MOD_TYPE_SCALE * 2) == 0) {
                             linePaint.setColor(mLineColorMax);
+                            linePaint.setStrokeWidth(mMaxBarWidth);
                             canvas.drawLine(xPosition, ry, xPosition, ry - mLineHeighMax, linePaint);
                             if (isShowScaleValue) {
                                 canvas.drawText(String.valueOf(value), xPosition, rHeight - mTpDesiredWidth, textPaint);
                             }
                         } else {
+                            linePaint.setStrokeWidth(mMidBarWidth);
                             linePaint.setColor(mLineColorMid);
                             canvas.drawLine(xPosition, ry, xPosition, ry - mLineHeighMid, linePaint);
                         }
                     }
                 } else {
-                    linePaint.setColor(mLineColorMin);
-                    canvas.drawLine(xPosition, ry, xPosition, ry - mLineHeighMin, linePaint);
+                    if (mModType == MOD_TYPE_HALF) {
+                        linePaint.setStrokeWidth(mMidBarWidth);
+                        linePaint.setColor(mLineColorMid);
+                        canvas.drawLine(xPosition, ry, xPosition, ry - mLineHeighMid, linePaint);
+                    } else {
+                        linePaint.setColor(mLineColorMin);
+                        linePaint.setStrokeWidth(mMinBarWidth);
+                        canvas.drawLine(xPosition, ry, xPosition, ry - mLineHeighMin, linePaint);
+                    }
                 }
             }
         }

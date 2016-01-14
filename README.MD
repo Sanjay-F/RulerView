@@ -16,12 +16,13 @@
 #特性
 
 1. 支持定义字体的大小和颜色和是否显示刻度值
-2. 支持定义各个刻度的颜色，目前有大,中,小三者，如图片所示，有最大的是黑色，中等的为绿色，最小的是蓝色。同时刻度间隔和刻度的大小可以调节。
+2. 支持定义各个刻度的颜色和大小，目前有大,中,小三者，如图片所示，有最大的是黑色，中等的为绿色，最小的是蓝色。同时刻度间隔和刻度的大小可以调节。
 3. 支持自定义中间的指标器。
 4. 可以有上和下，两种对齐的方式。
 5. 支持指定默认值。
 6. 支持设置最大和最小值。
 7. 两种刻度格式SCALE和HALF，前者为有10格刻度，后者为只有0.5一格小的刻度。参考图片
+
 
 
 # 不支持的
@@ -33,21 +34,34 @@
 # 使用方法
 
 ## XML
+
     <com.xk.sanjay.rulberview.RulerWheel
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:alignMode="DOWN"
-            app:def_value="40"
-            app:lineColorMax="#000000"
-            app:lineColorMid="#00aa00"
-            app:lineColorMin="#0e27ca"
-            app:line_divider="10dp"
-            app:max_value="100"
-            app:min_value="20"
-            app:mode="HALF"
-            app:scaleWidth="1dp"
-            app:showScaleValue="true"
-            app:text_Size="30"/>
+          android:id="@+id/ruler_view"
+          android:layout_width="match_parent"
+          android:layout_height="400dp"
+
+          app:line_divider="10dp"
+          app:MaxBarSize="3dp"
+          app:MidBarSize="2dp"
+          app:MinBarSize="1dp"
+          app:scaleWidth="1dp"
+          //不想具体设置各个刻度的大小时候，可以用这个设置所有的,不过scaleWidth优先级低于上面的
+
+          app:lineColorMax="#797979"
+          app:lineColorMid="#797979"
+          app:lineColorMin="#797979"
+
+          app:max_value="100"
+          app:min_value="20"
+          app:def_value="40"
+
+          app:mode="SCALE"
+          app:alignMode="DOWN"
+          app:showScaleValue="true"
+
+          app:text_Size="30"
+          app:text_color="#e21d6f"/>
+
             
 ##  Activity
 
