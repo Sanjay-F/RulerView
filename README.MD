@@ -1,5 +1,9 @@
  
 # 介绍
+
+
+这是一个水平的尺子滚轮插件
+
 ##模式1
 
 ![](art/demo.png)
@@ -8,7 +12,6 @@
 
 ![UpModel_HalfModel](art/demo_up_half.png)
 
-这是一个水平的滚轮支持插件
 
 #特性
 
