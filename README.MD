@@ -26,11 +26,12 @@
 6. 支持设置最大和最小值。
 7. 两种刻度格式SCALE和HALF，前者为有10格刻度，后者为只有0.5一格小的刻度。参考图片
 8. 刻度尺的渐显效果
+9. 支持显示自定义的数据！
 
 
 # 使用方法
 
-## XML
+## XML 默认方式
 
 
        <com.xk.sanjay.rulberview.RulerWheel
@@ -49,7 +50,7 @@
             app:lineColorMin="#797979"
             app:line_divider="10dp"
 
-
+			app:dataMode="DATA"
             app:max_value="100"
             app:min_value="20"
             app:def_value="40"
@@ -62,6 +63,35 @@
             app:showScaleValue="true"
             app:text_Size="30"
             app:text_color="#e21d6f"/>
+			
+## 使用自定义数组			
+			
+	 <com.xk.sanjay.rulberview.RulerWheel
+        android:id="@+id/ruler_view2"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+
+        app:MaxBarSize="2dp"
+        app:MidBarSize="1.5dp"
+        app:MinBarSize="1dp"
+
+        app:alignMode="DOWN"
+        app:dataMode="DATA"
+        app:dataSource="@array/demo_data"
+
+        app:lineColorMax="#797979"
+        app:lineColorMid="#797979"
+        app:lineColorMin="#797979"
+        app:line_divider="40dp"
+        app:mask_bg="@mipmap/icon_arrow"
+        app:max_value="100"
+        app:min_value="0"
+        app:mode="HALF"
+        app:scaleWidth="1dp"
+        app:showGradient="true"
+        app:showScaleValue="true"
+        app:text_Size="30"
+        app:text_color="#e21d6f"/>
 
             
 ##  Activity
@@ -83,6 +113,35 @@
 
             }
         });            
+		
+		
+##  dataModel---DATA
+
+			 List<String> list2 = new ArrayList<>();
+        for (int i = 1000; i < 50000; i += 500) {
+            list2.add(i + "");
+        }
+
+        tvCurValue2 = (TextView) findViewById(R.id.curValue2_tv);
+        rulerView2 = (RulerWheel) findViewById(R.id.ruler_view2);
+        //不默认数据的画可以加下面的方式设置
+        rulerView2.setData(list2);
+        rulerView2.setScrollingListener(new RulerWheel.OnWheelScrollListener<String>() {
+            @Override
+            public void onChanged(RulerWheel wheel, String oldValue, String newValue) {
+                tvCurValue2.setText(newValue + "");
+            }
+
+            @Override
+            public void onScrollingStarted(RulerWheel wheel) {
+
+            }
+
+            @Override
+            public void onScrollingFinished(RulerWheel wheel) {
+
+            }
+        });
             
 # 鸣谢
 特别感谢[獨行Zz](http://blog.csdn.net/dashu8193058/article/details/45846189)，这个项目是在他基础上改的。
