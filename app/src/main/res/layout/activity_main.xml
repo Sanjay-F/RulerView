@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.xk.sanjay.rulerview.MainActivity">
+
+    <com.xk.sanjay.rulberview.RulerWheel
+        android:id="@+id/ruler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:alignMode="DOWN"
+        app:def_value="40"
+        app:lineColorMax="#000000"
+        app:lineColorMid="#00aa00"
+        app:lineColorMin="#0e27ca"
+        app:line_divider="10dp"
+        app:max_value="100"
+        app:min_value="20"
+        app:mode="HALF"
+        app:scaleWidth="1dp"
+        app:showScaleValue="true"
+        app:text_Size="30"/>
+</LinearLayout>
