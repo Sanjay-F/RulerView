@@ -10,7 +10,6 @@ import android.graphics.Paint;
 import android.text.Layout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -21,7 +20,7 @@ import android.view.View;
  * Description: 参考自: http://blog.csdn.net/dashu8193058/article/details/45846189
  */
 public class RulerWheel extends View {
-    private String TAG = this.getClass().getSimpleName();
+//    private String TAG = this.getClass().getSimpleName();
     // 默认刻度模式
     public static final int MOD_TYPE_SCALE = 5;
     // 1/2模式
@@ -334,8 +333,8 @@ public class RulerWheel extends View {
         if (w == 0 || h == 0)
             return;
         int rHeight = h - getPaddingTop() - getPaddingBottom();
-        mLineHeighMax = rHeight / 2;
-        mLineHeighMid = rHeight / 3;
+        mLineHeighMax = rHeight / 3;
+        mLineHeighMid = rHeight / 4;
         mLineHeighMin = rHeight / 7;
     }
 
@@ -496,7 +495,7 @@ public class RulerWheel extends View {
         int value;
         float xPosition;
 
-        Log.e(TAG, " halfCount=" + halfCount + " rWidth" + rWidth);
+//        Log.e(TAG, " halfCount=" + halfCount + " rWidth" + rWidth);
         //线y坐标
         int ry = (int) (rHeight - mTpDesiredWidth - textPaint.getTextSize()) - getPaddingBottom();
         for (int i = 0; i < halfCount; i++) {
@@ -506,7 +505,7 @@ public class RulerWheel extends View {
             xPosition = rWidth / 2f + i * mLineDivder + distanceX;
             value = currValue + i;
             if (xPosition <= rWidth && value >= mMinValue && value <= mMaxValue) {
-                Log.e(TAG, "right value=" + value + " xPos=" + xPosition);
+//                Log.e(TAG, "right value=" + value + " xPos=" + xPosition);
                 if (value % mModType == 0) {
                     if (mModType == MOD_TYPE_HALF) {
                         linePaint.setColor(mLineColorMax);
@@ -552,7 +551,7 @@ public class RulerWheel extends View {
             xPosition = rWidth / 2f - i * mLineDivder + distanceX;
             value = currValue - i;
             if (xPosition > getPaddingLeft() && value >= mMinValue && value <= mMaxValue) {
-                Log.e(TAG, "left value=" + value);
+//                Log.e(TAG, "left value=" + value);
                 if (value % mModType == 0) {
                     if (mModType == MOD_TYPE_HALF) {
                         linePaint.setColor(mLineColorMax);

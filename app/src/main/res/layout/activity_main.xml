@@ -6,12 +6,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    android:orientation="vertical"
     tools:context="com.xk.sanjay.rulerview.MainActivity">
 
 
     <TextView
+        android:id="@+id/curValue_tv"
+        android:text="20"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="50dp"
+        android:textSize="20sp"
         android:textColor="#ff0989"/>
 
     <com.xk.sanjay.rulberview.RulerWheel
@@ -19,11 +25,11 @@
         android:layout_width="match_parent"
         android:layout_height="400dp"
 
-        app:MaxBarSize="3dp"
-        app:MidBarSize="2dp"
+        app:MaxBarSize="2dp"
+        app:MidBarSize="1.5dp"
         app:MinBarSize="1dp"
 
-        app:alignMode="UP"
+        app:alignMode="DOWN"
 
         app:def_value="40"
         app:lineColorMax="#797979"
@@ -33,13 +39,11 @@
         app:lineColorMin="#797979"
         app:line_divider="10dp"
 
-
+        app:mask_bg="@mipmap/icon_arrow"
         app:max_value="100"
         app:min_value="20"
         app:mode="SCALE"
-
         app:scaleWidth="1dp"
-
 
         app:showGradient="true"
         app:showScaleValue="true"
