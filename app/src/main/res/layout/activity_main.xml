@@ -22,7 +22,8 @@
         app:MaxBarSize="3dp"
         app:MidBarSize="2dp"
         app:MinBarSize="1dp"
-        app:alignMode="DOWN"
+
+        app:alignMode="UP"
 
         app:def_value="40"
         app:lineColorMax="#797979"
@@ -40,6 +41,7 @@
         app:scaleWidth="1dp"
 
 
+        app:showGradient="true"
         app:showScaleValue="true"
         app:text_Size="30"
         app:text_color="#e21d6f"/>

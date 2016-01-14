@@ -4,14 +4,17 @@
 
 这是一个水平的尺子滚轮插件
 
-##模式1
+##上对齐+显示效果
 
 ![](art/demo.png)
 
-##模式2
+##上对齐+折半显示效果
 
 ![UpModel_HalfModel](art/demo_up_half.png)
 
+## 渐显效果
+
+![UpModel_HalfModel](art/demo3.png)
 
 #特性
 
@@ -22,45 +25,43 @@
 5. 支持指定默认值。
 6. 支持设置最大和最小值。
 7. 两种刻度格式SCALE和HALF，前者为有10格刻度，后者为只有0.5一格小的刻度。参考图片
+8. 刻度尺的渐显效果
 
-
-
-# 不支持的
-
-1.现在还在加刻度尺的渐显效果
-
- 
 
 # 使用方法
 
 ## XML
 
-    <com.xk.sanjay.rulberview.RulerWheel
-          android:id="@+id/ruler_view"
-          android:layout_width="match_parent"
-          android:layout_height="400dp"
 
-          app:line_divider="10dp"
-          app:MaxBarSize="3dp"
-          app:MidBarSize="2dp"
-          app:MinBarSize="1dp"
-          app:scaleWidth="1dp"
-          //不想具体设置各个刻度的大小时候，可以用这个设置所有的,不过scaleWidth优先级低于上面的
+       <com.xk.sanjay.rulberview.RulerWheel
+            android:id="@+id/ruler_view"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
 
-          app:lineColorMax="#797979"
-          app:lineColorMid="#797979"
-          app:lineColorMin="#797979"
+            app:MaxBarSize="3dp"
+            app:MidBarSize="2dp"
+            app:MinBarSize="1dp"
+            app:scaleWidth="1dp"
+            //不想设置各刻度的大小时，可以用这个设置所有的,不过scaleWidth优先级低于上面的
+            
+            app:lineColorMax="#797979"
+            app:lineColorMid="#797979"
+            app:lineColorMin="#797979"
+            app:line_divider="10dp"
 
-          app:max_value="100"
-          app:min_value="20"
-          app:def_value="40"
 
-          app:mode="SCALE"
-          app:alignMode="DOWN"
-          app:showScaleValue="true"
+            app:max_value="100"
+            app:min_value="20"
+            app:def_value="40"
+            
+            app:mode="SCALE"
+             app:alignMode="UP"
 
-          app:text_Size="30"
-          app:text_color="#e21d6f"/>
+
+            app:showGradient="true"
+            app:showScaleValue="true"
+            app:text_Size="30"
+            app:text_color="#e21d6f"/>
 
             
 ##  Activity
