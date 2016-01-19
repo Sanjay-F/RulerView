@@ -31,6 +31,8 @@
         <attr name="max_value" format="integer"/>
         <attr name="min_value" format="integer"/>
         <attr name="mask_bg" format="reference"/>
+        <!--刻度值渐现-->
+        <attr name="scaleValueGradient" format="boolean"/>
 
 
         <attr name="mode">

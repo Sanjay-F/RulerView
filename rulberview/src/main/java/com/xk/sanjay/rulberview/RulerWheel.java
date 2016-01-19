@@ -83,6 +83,7 @@ public class RulerWheel extends View {
      * 是否支持渐显效果
      */
     private boolean mIsGradinet = false;
+    private boolean mIsScaleValueGradinet = false;
 
     private Paint linePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint markPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -168,6 +169,7 @@ public class RulerWheel extends View {
         mMinBarWidth = mTypedArray.getDimensionPixelSize(R.styleable.RulerWheel_MinBarSize, scaleWidth);
         //渐显显示刻度
         mIsGradinet = mTypedArray.getBoolean(R.styleable.RulerWheel_showGradient, false);
+        mIsScaleValueGradinet= mTypedArray.getBoolean(R.styleable.RulerWheel_scaleValueGradient, false);
         mTextColor = mTypedArray.getColor(R.styleable.RulerWheel_text_color, Color.BLACK);
 
         mDataModel = mTypedArray.getInteger(R.styleable.RulerWheel_dataMode, DATA_INT);
@@ -194,9 +196,6 @@ public class RulerWheel extends View {
             }
 
         }
-        //精度
-
-
         textPaint.setColor(mTextColor);
 
         mTypedArray.recycle();
@@ -450,7 +449,9 @@ public class RulerWheel extends View {
                         linePaint.setAlpha(getAlpha(halfCount, i));
                         canvas.drawLine(xPosition, ry, xPosition, ry + mLineHeighMax, linePaint);
                         if (isShowScaleValue) {
-
+                            if(mIsScaleValueGradinet){
+                                textPaint.setAlpha(getAlpha(halfCount, i));
+                            }
                             if (mDataModel == DATA_INT) {
                                 canvas.drawText(String.valueOf(value / 2), xPosition, ry - mTpDesiredWidth, textPaint);
                             } else {
@@ -464,6 +465,9 @@ public class RulerWheel extends View {
                             linePaint.setAlpha(getAlpha(halfCount, i));
                             canvas.drawLine(xPosition, ry, xPosition, ry + mLineHeighMax, linePaint);
                             if (isShowScaleValue) {
+                                if(mIsScaleValueGradinet){
+                                    textPaint.setAlpha(getAlpha(halfCount, i));
+                                }
                                 if (mDataModel == DATA_INT) {
                                     canvas.drawText(String.valueOf(value), xPosition, ry - mTpDesiredWidth, textPaint);
                                 } else {
@@ -504,6 +508,9 @@ public class RulerWheel extends View {
                         linePaint.setAlpha(getAlpha(halfCount, i));
                         canvas.drawLine(xPosition, ry, xPosition, ry + mLineHeighMax, linePaint);
                         if (isShowScaleValue) {
+                            if(mIsScaleValueGradinet){
+                                textPaint.setAlpha(getAlpha(halfCount, i));
+                            }
                             if (mDataModel == DATA_INT) {
                                 canvas.drawText(String.valueOf(value / 2), xPosition, ry - mTpDesiredWidth, textPaint);
                             } else {
@@ -517,6 +524,9 @@ public class RulerWheel extends View {
                             linePaint.setAlpha(getAlpha(halfCount, i));
                             canvas.drawLine(xPosition, ry, xPosition, ry + mLineHeighMax, linePaint);
                             if (isShowScaleValue) {
+                                if(mIsScaleValueGradinet){
+                                    textPaint.setAlpha(getAlpha(halfCount, i));
+                                }
                                 if (mDataModel == DATA_INT) {
                                     canvas.drawText(String.valueOf(value), xPosition, ry - mTpDesiredWidth, textPaint);
                                 } else {
@@ -566,6 +576,9 @@ public class RulerWheel extends View {
                         linePaint.setAlpha(getAlpha(halfCount, i));
                         canvas.drawLine(xPosition, ry, xPosition, ry - mLineHeighMax, linePaint);
                         if (isShowScaleValue) {
+                            if(mIsScaleValueGradinet){
+                                textPaint.setAlpha(getAlpha(halfCount, i));
+                            }
                             if (mDataModel == DATA_INT) {
                                 canvas.drawText(String.valueOf(value / 2), xPosition, rHeight - mTpDesiredWidth, textPaint);
                             } else {
@@ -580,6 +593,9 @@ public class RulerWheel extends View {
                             linePaint.setAlpha(getAlpha(halfCount, i));
                             canvas.drawLine(xPosition, ry, xPosition, ry - mLineHeighMax, linePaint);
                             if (isShowScaleValue) {
+                                if(mIsScaleValueGradinet){
+                                    textPaint.setAlpha(getAlpha(halfCount, i));
+                                }
                                 if (mDataModel == DATA_INT) {
                                     canvas.drawText(String.valueOf(value), xPosition, rHeight - mTpDesiredWidth, textPaint);
                                 } else {
@@ -621,6 +637,9 @@ public class RulerWheel extends View {
                         canvas.drawLine(xPosition, ry, xPosition, ry - mLineHeighMax, linePaint);
                         if (isShowScaleValue) {
                             if (mDataModel == DATA_INT) {
+                                if(mIsScaleValueGradinet){
+                                    textPaint.setAlpha(getAlpha(halfCount, i));
+                                }
                                 canvas.drawText(String.valueOf(value / 2), xPosition, rHeight - mTpDesiredWidth, textPaint);
                             } else {
                                 canvas.drawText(String.valueOf(dataList.get(value)), xPosition, rHeight - mTpDesiredWidth, textPaint);
@@ -633,6 +652,9 @@ public class RulerWheel extends View {
                             linePaint.setAlpha(getAlpha(halfCount, i));
                             canvas.drawLine(xPosition, ry, xPosition, ry - mLineHeighMax, linePaint);
                             if (isShowScaleValue) {
+                                if(mIsScaleValueGradinet){
+                                    textPaint.setAlpha(getAlpha(halfCount, i));
+                                }
                                 if (mDataModel == DATA_INT) {
                                     canvas.drawText(String.valueOf(value), xPosition, rHeight - mTpDesiredWidth, textPaint);
                                 } else {

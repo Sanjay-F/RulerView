@@ -63,6 +63,7 @@
         app:alignMode="DOWN"
         app:dataMode="DATA"
         app:dataSource="@array/demo_data"
+        app:scaleValueGradient="true"
 
         app:lineColorMax="#797979"
         app:lineColorMid="#797979"
