@@ -13,6 +13,9 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * Created by zz
@@ -20,7 +23,7 @@ import android.view.View;
  * Description: 参考自: http://blog.csdn.net/dashu8193058/article/details/45846189
  */
 public class RulerWheel extends View {
-//    private String TAG = this.getClass().getSimpleName();
+    private String TAG = this.getClass().getSimpleName();
     // 默认刻度模式
     public static final int MOD_TYPE_SCALE = 5;
     // 1/2模式
@@ -80,16 +83,21 @@ public class RulerWheel extends View {
      * 是否支持渐显效果
      */
     private boolean mIsGradinet = false;
-    /**
-     * 最小的可见度
-     */
-    private float MINI_ALPHAT = 0.3F;
+    private boolean mIsScaleValueGradinet = false;
 
     private Paint linePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint markPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
     private float mTpDesiredWidth;
+
     private int scaleWidth;
+
+    //数据模型，有两种，一种是数据增长方式，另外一个中就是用户自定要显示的数据，要求实现tostring（）函数
+    private int mDataModel;
+    private static final int DATA_INT = 0;
+    private static final int DATA_SET = 1;
+    private List<String> dataList;
+    private CharSequence[] dataSource;
 
     public RulerWheel(Context context) {
         this(context, null);
@@ -161,7 +169,33 @@ public class RulerWheel extends View {
         mMinBarWidth = mTypedArray.getDimensionPixelSize(R.styleable.RulerWheel_MinBarSize, scaleWidth);
         //渐显显示刻度
         mIsGradinet = mTypedArray.getBoolean(R.styleable.RulerWheel_showGradient, false);
+        mIsScaleValueGradinet= mTypedArray.getBoolean(R.styleable.RulerWheel_scaleValueGradient, false);
         mTextColor = mTypedArray.getColor(R.styleable.RulerWheel_text_color, Color.BLACK);
+
+        mDataModel = mTypedArray.getInteger(R.styleable.RulerWheel_dataMode, DATA_INT);
+        if (mDataModel == DATA_SET) {
+
+            dataSource = mTypedArray.getTextArray(R.styleable.RulerWheel_dataSource);
+
+            dataList = new ArrayList<>();
+
+            if (dataSource != null) {
+
+                for (int i = 0; i < dataSource.length; i++) {
+                    dataList.add(String.valueOf(dataSource[i]));
+                }
+
+                mMinValue = 0;
+                mMaxValue = dataSource.length-1;
+            } else {
+                for (int i = 0; i < 20; i++) {
+                    dataList.add(i * 2 + "");
+                }
+                mMinValue = 0;
+                mMaxValue = 19;
+            }
+
+        }
         textPaint.setColor(mTextColor);
 
         mTypedArray.recycle();
@@ -235,12 +269,16 @@ public class RulerWheel extends View {
         int offsetCount = scrollingOffset / mLineDivder;
         if (0 != offsetCount) {
             // 显示在范围内
-            int oldValue = Math.min(Math.max(mMinValue, mCurrValue), mMaxValue);
+//            int oldValue = Math.min(Math.max(mMinValue, mCurrValue), mMaxValue);
+            int oldValueIndex = Math.min(Math.max(mMinValue, mCurrValue), mMaxValue);
+
+
             mCurrValue -= offsetCount;
             scrollingOffset -= offsetCount * mLineDivder;
             if (null != onWheelListener) {
                 //回调通知最新的值
-                onWheelListener.onChanged(this, oldValue, Math.min(Math.max(mMinValue, mCurrValue), mMaxValue));
+                int valueIndex = Math.min(Math.max(mMinValue, mCurrValue), mMaxValue);
+                onWheelListener.onChanged(this, dataList.get(oldValueIndex) + "", dataList.get(valueIndex));
             }
         }
         invalidate();
@@ -411,7 +449,14 @@ public class RulerWheel extends View {
                         linePaint.setAlpha(getAlpha(halfCount, i));
                         canvas.drawLine(xPosition, ry, xPosition, ry + mLineHeighMax, linePaint);
                         if (isShowScaleValue) {
-                            canvas.drawText(String.valueOf(value / 2), xPosition, ry - mTpDesiredWidth, textPaint);
+                            if(mIsScaleValueGradinet){
+                                textPaint.setAlpha(getAlpha(halfCount, i));
+                            }
+                            if (mDataModel == DATA_INT) {
+                                canvas.drawText(String.valueOf(value / 2), xPosition, ry - mTpDesiredWidth, textPaint);
+                            } else {
+                                canvas.drawText(String.valueOf(dataList.get(value)), xPosition, rHeight - mTpDesiredWidth, textPaint);
+                            }
                         }
                     } else if (mModType == MOD_TYPE_SCALE) {
                         if (value % (MOD_TYPE_SCALE * 2) == 0) {
@@ -420,7 +465,15 @@ public class RulerWheel extends View {
                             linePaint.setAlpha(getAlpha(halfCount, i));
                             canvas.drawLine(xPosition, ry, xPosition, ry + mLineHeighMax, linePaint);
                             if (isShowScaleValue) {
-                                canvas.drawText(String.valueOf(value), xPosition, ry - mTpDesiredWidth, textPaint);
+                                if(mIsScaleValueGradinet){
+                                    textPaint.setAlpha(getAlpha(halfCount, i));
+                                }
+                                if (mDataModel == DATA_INT) {
+                                    canvas.drawText(String.valueOf(value), xPosition, ry - mTpDesiredWidth, textPaint);
+                                } else {
+                                    canvas.drawText(String.valueOf(dataList.get(value)), xPosition, rHeight - mTpDesiredWidth, textPaint);
+                                }
+
                             }
                         } else {
                             linePaint.setStrokeWidth(mMidBarWidth);
@@ -455,7 +508,14 @@ public class RulerWheel extends View {
                         linePaint.setAlpha(getAlpha(halfCount, i));
                         canvas.drawLine(xPosition, ry, xPosition, ry + mLineHeighMax, linePaint);
                         if (isShowScaleValue) {
-                            canvas.drawText(String.valueOf(value / 2), xPosition, ry - mTpDesiredWidth, textPaint);
+                            if(mIsScaleValueGradinet){
+                                textPaint.setAlpha(getAlpha(halfCount, i));
+                            }
+                            if (mDataModel == DATA_INT) {
+                                canvas.drawText(String.valueOf(value / 2), xPosition, ry - mTpDesiredWidth, textPaint);
+                            } else {
+                                canvas.drawText(String.valueOf(dataList.get(value)), xPosition, rHeight - mTpDesiredWidth, textPaint);
+                            }
                         }
                     } else if (mModType == MOD_TYPE_SCALE) {
                         if (value % (MOD_TYPE_SCALE * 2) == 0) {
@@ -464,7 +524,14 @@ public class RulerWheel extends View {
                             linePaint.setAlpha(getAlpha(halfCount, i));
                             canvas.drawLine(xPosition, ry, xPosition, ry + mLineHeighMax, linePaint);
                             if (isShowScaleValue) {
-                                canvas.drawText(String.valueOf(value), xPosition, ry - mTpDesiredWidth, textPaint);
+                                if(mIsScaleValueGradinet){
+                                    textPaint.setAlpha(getAlpha(halfCount, i));
+                                }
+                                if (mDataModel == DATA_INT) {
+                                    canvas.drawText(String.valueOf(value), xPosition, ry - mTpDesiredWidth, textPaint);
+                                } else {
+                                    canvas.drawText(String.valueOf(dataList.get(value)), xPosition, rHeight - mTpDesiredWidth, textPaint);
+                                }
                             }
                         } else {
                             linePaint.setColor(mLineColorMid);
@@ -494,13 +561,9 @@ public class RulerWheel extends View {
     private void drawDownMode(Canvas canvas, int halfCount, int distanceX, int currValue, int rWidth, int rHeight) {
         int value;
         float xPosition;
-
-//        Log.e(TAG, " halfCount=" + halfCount + " rWidth" + rWidth);
         //线y坐标
         int ry = (int) (rHeight - mTpDesiredWidth - textPaint.getTextSize()) - getPaddingBottom();
         for (int i = 0; i < halfCount; i++) {
-
-
             //画显示在屏幕上的右半部分数据---right part
             xPosition = rWidth / 2f + i * mLineDivder + distanceX;
             value = currValue + i;
@@ -513,7 +576,14 @@ public class RulerWheel extends View {
                         linePaint.setAlpha(getAlpha(halfCount, i));
                         canvas.drawLine(xPosition, ry, xPosition, ry - mLineHeighMax, linePaint);
                         if (isShowScaleValue) {
-                            canvas.drawText(String.valueOf(value / 2), xPosition, rHeight - mTpDesiredWidth, textPaint);
+                            if(mIsScaleValueGradinet){
+                                textPaint.setAlpha(getAlpha(halfCount, i));
+                            }
+                            if (mDataModel == DATA_INT) {
+                                canvas.drawText(String.valueOf(value / 2), xPosition, rHeight - mTpDesiredWidth, textPaint);
+                            } else {
+                                canvas.drawText(String.valueOf(dataList.get(value)), xPosition, rHeight - mTpDesiredWidth, textPaint);
+                            }
                         }
 
                     } else if (mModType == MOD_TYPE_SCALE) {
@@ -523,7 +593,14 @@ public class RulerWheel extends View {
                             linePaint.setAlpha(getAlpha(halfCount, i));
                             canvas.drawLine(xPosition, ry, xPosition, ry - mLineHeighMax, linePaint);
                             if (isShowScaleValue) {
-                                canvas.drawText(String.valueOf(value), xPosition, rHeight - mTpDesiredWidth, textPaint);
+                                if(mIsScaleValueGradinet){
+                                    textPaint.setAlpha(getAlpha(halfCount, i));
+                                }
+                                if (mDataModel == DATA_INT) {
+                                    canvas.drawText(String.valueOf(value), xPosition, rHeight - mTpDesiredWidth, textPaint);
+                                } else {
+                                    canvas.drawText(String.valueOf(dataList.get(value)), xPosition, rHeight - mTpDesiredWidth, textPaint);
+                                }
                             }
                         } else {
                             linePaint.setStrokeWidth(mMidBarWidth);
@@ -559,7 +636,14 @@ public class RulerWheel extends View {
                         linePaint.setAlpha(getAlpha(halfCount, i));
                         canvas.drawLine(xPosition, ry, xPosition, ry - mLineHeighMax, linePaint);
                         if (isShowScaleValue) {
-                            canvas.drawText(String.valueOf(value / 2), xPosition, rHeight - mTpDesiredWidth, textPaint);
+                            if (mDataModel == DATA_INT) {
+                                if(mIsScaleValueGradinet){
+                                    textPaint.setAlpha(getAlpha(halfCount, i));
+                                }
+                                canvas.drawText(String.valueOf(value / 2), xPosition, rHeight - mTpDesiredWidth, textPaint);
+                            } else {
+                                canvas.drawText(String.valueOf(dataList.get(value)), xPosition, rHeight - mTpDesiredWidth, textPaint);
+                            }
                         }
                     } else if (mModType == MOD_TYPE_SCALE) {
                         if (value % (MOD_TYPE_SCALE * 2) == 0) {
@@ -568,7 +652,14 @@ public class RulerWheel extends View {
                             linePaint.setAlpha(getAlpha(halfCount, i));
                             canvas.drawLine(xPosition, ry, xPosition, ry - mLineHeighMax, linePaint);
                             if (isShowScaleValue) {
-                                canvas.drawText(String.valueOf(value), xPosition, rHeight - mTpDesiredWidth, textPaint);
+                                if(mIsScaleValueGradinet){
+                                    textPaint.setAlpha(getAlpha(halfCount, i));
+                                }
+                                if (mDataModel == DATA_INT) {
+                                    canvas.drawText(String.valueOf(value), xPosition, rHeight - mTpDesiredWidth, textPaint);
+                                } else {
+                                    canvas.drawText(String.valueOf(dataList.get(value)), xPosition, rHeight - mTpDesiredWidth, textPaint);
+                                }
                             }
                         } else {
                             linePaint.setStrokeWidth(mMidBarWidth);
@@ -637,6 +728,21 @@ public class RulerWheel extends View {
         return scroller.onTouchEvent(event);
     }
 
+    public void setData(List<String> dataList) {
+        setDataModel(DATA_SET);
+        mMinValue = 0;
+        mMaxValue = dataList.size() - 1;
+        this.dataList = dataList;
+        invalidate();
+    }
+
+    /***
+     * @param dataModel 只支持{@link RulerWheel#DATA_INT}和{@link RulerWheel#DATA_SET}
+     */
+    public void setDataModel(int dataModel) {
+        this.mDataModel = dataModel;
+    }
+
     //---------------------
     //region 回调接口通知部分
 
@@ -681,7 +787,7 @@ public class RulerWheel extends View {
     }
 
 
-    public interface OnWheelScrollListener {
+    public interface OnWheelScrollListener<T> {
         /**
          * Callback method to be invoked when current item changed
          *
@@ -689,7 +795,7 @@ public class RulerWheel extends View {
          * @param oldValue the old value of current item
          * @param newValue the new value of current item
          */
-        void onChanged(RulerWheel wheel, int oldValue, int newValue);
+        void onChanged(RulerWheel wheel, T oldValue, T newValue);
 
         /**
          * Callback method to be invoked when scrolling started.
