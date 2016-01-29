@@ -57,9 +57,11 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 1000; i < 50000; i += 500) {
             list2.add(i + "");
         }
-
         tvCurValue2 = (TextView) findViewById(R.id.curValue2_tv);
         rulerView2 = (RulerWheel) findViewById(R.id.ruler_view2);
+        rulerView2.setData(list2);
+        rulerView2.setDataModel(RulerWheel.DATA_SET);
+        rulerView2.setSelectedValue("8000");
         //不默认数据的画可以加下面的方式设置
 //        rulerView2.setData(list2);
         rulerView2.setScrollingListener(new RulerWheel.OnWheelScrollListener<String>() {

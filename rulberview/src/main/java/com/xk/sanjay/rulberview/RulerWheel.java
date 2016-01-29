@@ -94,8 +94,8 @@ public class RulerWheel extends View {
 
     //数据模型，有两种，一种是数据增长方式，另外一个中就是用户自定要显示的数据，要求实现tostring（）函数
     private int mDataModel;
-    private static final int DATA_INT = 0;
-    private static final int DATA_SET = 1;
+    public static final int DATA_INT = 0;
+    public static final int DATA_SET = 1;
     private List<String> dataList;
     private CharSequence[] dataSource;
 
@@ -169,7 +169,7 @@ public class RulerWheel extends View {
         mMinBarWidth = mTypedArray.getDimensionPixelSize(R.styleable.RulerWheel_MinBarSize, scaleWidth);
         //渐显显示刻度
         mIsGradinet = mTypedArray.getBoolean(R.styleable.RulerWheel_showGradient, false);
-        mIsScaleValueGradinet= mTypedArray.getBoolean(R.styleable.RulerWheel_scaleValueGradient, false);
+        mIsScaleValueGradinet = mTypedArray.getBoolean(R.styleable.RulerWheel_scaleValueGradient, false);
         mTextColor = mTypedArray.getColor(R.styleable.RulerWheel_text_color, Color.BLACK);
 
         mDataModel = mTypedArray.getInteger(R.styleable.RulerWheel_dataMode, DATA_INT);
@@ -186,7 +186,7 @@ public class RulerWheel extends View {
                 }
 
                 mMinValue = 0;
-                mMaxValue = dataSource.length-1;
+                mMaxValue = dataSource.length - 1;
             } else {
                 for (int i = 0; i < 20; i++) {
                     dataList.add(i * 2 + "");
@@ -449,7 +449,7 @@ public class RulerWheel extends View {
                         linePaint.setAlpha(getAlpha(halfCount, i));
                         canvas.drawLine(xPosition, ry, xPosition, ry + mLineHeighMax, linePaint);
                         if (isShowScaleValue) {
-                            if(mIsScaleValueGradinet){
+                            if (mIsScaleValueGradinet) {
                                 textPaint.setAlpha(getAlpha(halfCount, i));
                             }
                             if (mDataModel == DATA_INT) {
@@ -465,7 +465,7 @@ public class RulerWheel extends View {
                             linePaint.setAlpha(getAlpha(halfCount, i));
                             canvas.drawLine(xPosition, ry, xPosition, ry + mLineHeighMax, linePaint);
                             if (isShowScaleValue) {
-                                if(mIsScaleValueGradinet){
+                                if (mIsScaleValueGradinet) {
                                     textPaint.setAlpha(getAlpha(halfCount, i));
                                 }
                                 if (mDataModel == DATA_INT) {
@@ -508,7 +508,7 @@ public class RulerWheel extends View {
                         linePaint.setAlpha(getAlpha(halfCount, i));
                         canvas.drawLine(xPosition, ry, xPosition, ry + mLineHeighMax, linePaint);
                         if (isShowScaleValue) {
-                            if(mIsScaleValueGradinet){
+                            if (mIsScaleValueGradinet) {
                                 textPaint.setAlpha(getAlpha(halfCount, i));
                             }
                             if (mDataModel == DATA_INT) {
@@ -524,7 +524,7 @@ public class RulerWheel extends View {
                             linePaint.setAlpha(getAlpha(halfCount, i));
                             canvas.drawLine(xPosition, ry, xPosition, ry + mLineHeighMax, linePaint);
                             if (isShowScaleValue) {
-                                if(mIsScaleValueGradinet){
+                                if (mIsScaleValueGradinet) {
                                     textPaint.setAlpha(getAlpha(halfCount, i));
                                 }
                                 if (mDataModel == DATA_INT) {
@@ -576,7 +576,7 @@ public class RulerWheel extends View {
                         linePaint.setAlpha(getAlpha(halfCount, i));
                         canvas.drawLine(xPosition, ry, xPosition, ry - mLineHeighMax, linePaint);
                         if (isShowScaleValue) {
-                            if(mIsScaleValueGradinet){
+                            if (mIsScaleValueGradinet) {
                                 textPaint.setAlpha(getAlpha(halfCount, i));
                             }
                             if (mDataModel == DATA_INT) {
@@ -593,7 +593,7 @@ public class RulerWheel extends View {
                             linePaint.setAlpha(getAlpha(halfCount, i));
                             canvas.drawLine(xPosition, ry, xPosition, ry - mLineHeighMax, linePaint);
                             if (isShowScaleValue) {
-                                if(mIsScaleValueGradinet){
+                                if (mIsScaleValueGradinet) {
                                     textPaint.setAlpha(getAlpha(halfCount, i));
                                 }
                                 if (mDataModel == DATA_INT) {
@@ -637,7 +637,7 @@ public class RulerWheel extends View {
                         canvas.drawLine(xPosition, ry, xPosition, ry - mLineHeighMax, linePaint);
                         if (isShowScaleValue) {
                             if (mDataModel == DATA_INT) {
-                                if(mIsScaleValueGradinet){
+                                if (mIsScaleValueGradinet) {
                                     textPaint.setAlpha(getAlpha(halfCount, i));
                                 }
                                 canvas.drawText(String.valueOf(value / 2), xPosition, rHeight - mTpDesiredWidth, textPaint);
@@ -652,7 +652,7 @@ public class RulerWheel extends View {
                             linePaint.setAlpha(getAlpha(halfCount, i));
                             canvas.drawLine(xPosition, ry, xPosition, ry - mLineHeighMax, linePaint);
                             if (isShowScaleValue) {
-                                if(mIsScaleValueGradinet){
+                                if (mIsScaleValueGradinet) {
                                     textPaint.setAlpha(getAlpha(halfCount, i));
                                 }
                                 if (mDataModel == DATA_INT) {
@@ -813,4 +813,11 @@ public class RulerWheel extends View {
     }
 //endregion
 
+
+    public void setSelectedValue(String selectedValue) {
+        if (dataList != null && selectedValue != null) {
+            int index = dataList.indexOf(selectedValue);
+            mCurrValue = index == -1 ? mMinValue : index;
+        }
+    }
 }
