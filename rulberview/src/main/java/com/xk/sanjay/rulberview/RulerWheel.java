@@ -7,21 +7,19 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.support.annotation.IntDef;
 import android.text.Layout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
-
-/**
- * Created by zz
- * date 2015/5/15
- * Description: 参考自: http://blog.csdn.net/dashu8193058/article/details/45846189
- */
+ 
 public class RulerWheel extends View {
     private String TAG = this.getClass().getSimpleName();
     // 默认刻度模式
@@ -94,6 +92,16 @@ public class RulerWheel extends View {
 
     //数据模型，有两种，一种是数据增长方式，另外一个中就是用户自定要显示的数据，要求实现tostring（）函数
     private int mDataModel;
+
+    @IntDef(flag = true,
+            value = {
+                    DATA_INT,
+                    DATA_SET
+            })
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface DataModel {
+    }
+
     public static final int DATA_INT = 0;
     public static final int DATA_SET = 1;
     private List<String> dataList;
@@ -739,7 +747,7 @@ public class RulerWheel extends View {
     /***
      * @param dataModel 只支持{@link RulerWheel#DATA_INT}和{@link RulerWheel#DATA_SET}
      */
-    public void setDataModel(int dataModel) {
+    public void setDataModel(@DataModel int dataModel) {
         this.mDataModel = dataModel;
     }
 
@@ -815,7 +823,7 @@ public class RulerWheel extends View {
 
 
     public void setSelectedValue(String selectedValue) {
-        if (dataList != null && selectedValue != null) {
+        if (mDataModel == DATA_SET && dataList != null && selectedValue != null) {
             int index = dataList.indexOf(selectedValue);
             mCurrValue = index == -1 ? mMinValue : index;
         }

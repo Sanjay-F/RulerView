@@ -8,11 +8,6 @@ import android.view.MotionEvent;
 import android.view.animation.Interpolator;
 import android.widget.Scroller;
 
-/**
- * Created by Administrator
- * date 2015/5/18
- * Description:
- */
 public class WheelHorizontalScroller {
     /**
      * Scrolling listener interface
