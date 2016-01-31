@@ -19,7 +19,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
- 
+
 public class RulerWheel extends View {
     private String TAG = this.getClass().getSimpleName();
     // 默认刻度模式
